@@ -478,6 +478,14 @@ export default function App() {
       return;
     }
 
+    if (mod.id === 'marketing') {
+      setSelectedModule(mod);
+      setSelectedSubMenu(mod.subMenus[0] || null);
+      setCurrentTab('marketing');
+      setCurrentScreen('feature');
+      return;
+    }
+
     setSelectedModule(mod);
     setCurrentTab(mod.id);
     setCurrentScreen('submenu');
@@ -536,6 +544,7 @@ export default function App() {
   const handleBack = () => {
     if (currentScreen === 'feature') {
       if (
+        selectedModule?.id === 'marketing' ||
         selectedModule?.id === 'staff' ||
         selectedModule?.id === 'setting' ||
         selectedModule?.id === 'basic' || 
@@ -584,9 +593,9 @@ export default function App() {
     } else if (tabId === 'marketing') {
       const mktMod = activeModules.find((m) => m.id === 'marketing') || activeModules[0];
       setSelectedModule(mktMod);
-      setSelectedSubMenu(null);
-      setCurrentScreen('submenu');
+      setSelectedSubMenu(mktMod.subMenus[0] || null);
       setCurrentTab('marketing');
+      setCurrentScreen('feature');
     } else if (tabId === 'setting') {
       handleOpenUniversalMenu('setting');
     } else if (tabId === 'basic' || tabId === 'core') {
@@ -1015,6 +1024,33 @@ export default function App() {
     }
 
     if (currentScreen === 'submenu' && selectedModule) {
+      if (selectedModule.id === 'marketing') {
+        const initTab = (selectedSubMenu?.id === 'etalase-online' || selectedSubMenu?.targetView === 'mkt-etalase')
+          ? 'etalase-online'
+          : (selectedSubMenu?.id || 'etalase-online');
+
+        return (
+          <MarketingView
+            initialTab={initTab}
+            customers={customers}
+            campaigns={campaigns}
+            vouchers={vouchers}
+            businessType={businessType}
+            subscription={subscription}
+            profile={profile}
+            onOpenSubscriptionModal={() => setIsSubscriptionModalOpen(true)}
+            onBack={handleGoHome}
+            onSendCampaign={(newCmp) => setCampaigns([newCmp, ...campaigns])}
+            onAddVoucher={(newVch) => setVouchers([newVch, ...vouchers])}
+            onToggleVoucherActive={(vchId) =>
+              setVouchers((prev) =>
+                prev.map((v) => (v.id === vchId ? { ...v, isActive: !v.isActive } : v))
+              )
+            }
+          />
+        );
+      }
+
       return (
         <SubMenuPage
           module={selectedModule}
@@ -1128,7 +1164,7 @@ export default function App() {
               subscription={subscription}
               profile={profile}
               onOpenSubscriptionModal={() => setIsSubscriptionModalOpen(true)}
-              onBack={handleBack}
+              onBack={handleGoHome}
               onSendCampaign={(newCmp) => setCampaigns([newCmp, ...campaigns])}
               onAddVoucher={(newVch) => setVouchers([newVch, ...vouchers])}
               onToggleVoucherActive={(vchId) =>

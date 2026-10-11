@@ -28,6 +28,8 @@ import {
 } from 'lucide-react';
 import { MarketingCampaign, PromoVoucher, CustomerVehicle, BusinessType, SubscriptionState, WorkshopProfile } from '../../types';
 import { EtalaseOnlineView } from './EtalaseOnlineView';
+import { DynamicLogoUQ } from '../common/DynamicLogoUQ';
+import { BUSINESS_TYPES } from '../../data/mockData';
 
 interface MarketingViewProps {
   initialTab?: string;
@@ -350,101 +352,236 @@ export const MarketingView: React.FC<MarketingViewProps> = ({
     showToast('Teks berhasil disalin ke clipboard!');
   };
 
+  const currentBusinessMeta = BUSINESS_TYPES.find(b => b.id === businessType) || BUSINESS_TYPES[0];
+  const activeVouchersCount = vouchers.filter((v) => v.isActive).length;
+
+  const marketingSubMenuItems = [
+    {
+      id: 'etalase-online',
+      title: businessType === 'resto' ? 'Etalase Menu QR' : businessType === 'ritel' ? 'Etalase Toko WA' : 'Etalase Web & WA',
+      subtitle: businessType === 'resto' ? 'Katalog Meja & WA' : businessType === 'ritel' ? 'Produk QR & WA' : 'Katalog QR Cloud & WA',
+      icon: Globe,
+      badge: 'Cloud QR'
+    },
+    {
+      id: 'broadcast-wa',
+      title: businessType === 'resto' ? 'Broadcast Promo' : businessType === 'ritel' ? 'Broadcast Diskon' : 'Broadcast WhatsApp',
+      subtitle: 'Kirim Promo & Reminder',
+      icon: Send,
+      badge: 'WA Blast'
+    },
+    {
+      id: 'promo-diskon',
+      title: 'Promo & Diskon',
+      subtitle: businessType === 'resto' ? 'Voucher Makan & Paket' : businessType === 'ritel' ? 'Voucher Belanja Rak' : 'Kupon Servis & Diskon',
+      icon: Tag,
+      badge: `${activeVouchersCount} Aktif`
+    },
+    {
+      id: 'riwayat-pesan',
+      title: 'Riwayat Pesan',
+      subtitle: 'Log Siaran & Kampanye',
+      icon: Clock,
+      badge: `${campaigns.length} Log`
+    }
+  ];
+
   return (
     <div className="flex-1 bg-slate-50 flex flex-col min-h-screen">
-      {/* 1. COMPACT SUB-MENU HEADER */}
-      <div className="bg-[#008952] text-white px-4 py-2.5 shadow-sm sticky top-0 z-30">
-        <div className="flex items-center justify-between gap-2">
+      {/* ========================================================
+          ZONA 1: HEADER ATAS KHAS HALAMAN UTAMA (BERANDA)
+          ======================================================== */}
+      <header className="bg-[#008952] text-white px-4 pt-3 pb-3 relative overflow-hidden rounded-b-2xl shadow-sm shrink-0 sticky top-0 z-30">
+        <div className="relative z-10 flex items-center justify-between gap-3">
+          {/* Back button & Master Logo UQ & Business Identity */}
           <div className="flex items-center gap-2.5 min-w-0">
             <button
               onClick={onBack}
-              aria-label="Kembali"
-              className="w-8 h-8 rounded-full bg-white/15 active:bg-white/30 flex items-center justify-center transition-colors shadow-xs shrink-0 cursor-pointer"
+              aria-label="Kembali ke Beranda"
+              title="Kembali ke Beranda"
+              className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 active:scale-95 flex items-center justify-center transition-all shadow-xs shrink-0 cursor-pointer text-white"
             >
-              <ArrowLeft className="w-4 h-4 text-white" />
+              <ArrowLeft className="w-4.5 h-4.5 text-white" />
             </button>
+
+            <DynamicLogoUQ businessType={businessType} size="sm" />
+
             <div className="min-w-0">
-              <h1 className="text-sm font-bold tracking-tight truncate leading-tight">
-                {headerMeta.title}
-              </h1>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h2 className="text-sm font-extrabold tracking-tight truncate leading-tight text-white">
+                  {profile?.workshopName || 'Marketing & Promosi Qu'}
+                </h2>
+
+                {/* Business Mode Badge */}
+                <div className="bg-white/20 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full flex items-center gap-1 border border-white/20 shrink-0">
+                  {businessType === 'resto' && <UtensilsCrossed className="w-2.5 h-2.5" />}
+                  {businessType === 'ritel' && <ScanBarcode className="w-2.5 h-2.5" />}
+                  {businessType === 'bengkel' && <Wrench className="w-2.5 h-2.5" />}
+                  <span>{currentBusinessMeta.name}</span>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-emerald-100/90 font-medium truncate mt-0.5">
+                Pusat Promosi, Broadcast WA & Etalase Online
+              </p>
             </div>
           </div>
 
+          {/* Right side: Today Date Badge */}
           <div className="flex items-center gap-1.5 shrink-0">
-            <div className="px-2 py-1 rounded-lg bg-emerald-800/40 text-[10px] font-bold text-white flex items-center gap-1">
+            <div className="px-2.5 py-1 rounded-xl bg-emerald-800/50 text-[10px] font-bold text-white flex items-center gap-1 border border-emerald-700/40">
               <Calendar className="w-3 h-3 text-emerald-200" />
               <span>{todayStr}</span>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Floating Toast Notification */}
       {toastMessage && (
-        <div className="bg-emerald-900 text-white text-xs font-semibold px-4 py-2.5 shadow-lg flex items-center justify-between gap-2 sticky top-[48px] z-20">
+        <div className="bg-emerald-900 text-white text-xs font-semibold px-4 py-2.5 shadow-lg flex items-center justify-between gap-2 sticky top-[52px] z-20">
           <div className="flex items-center gap-2 min-w-0">
             <Check className="w-4 h-4 text-emerald-400 shrink-0" />
             <span className="truncate">{toastMessage}</span>
           </div>
           <button
             onClick={() => setToastMessage(null)}
-            className="text-[10px] text-emerald-300 font-bold hover:underline shrink-0"
+            className="text-[10px] text-emerald-300 font-bold hover:underline shrink-0 cursor-pointer"
           >
             Tutup
           </button>
         </div>
       )}
 
-      {/* Tab Switcher */}
-      <div className="bg-white border-b border-slate-200 px-4 py-2 sticky top-[48px] z-10">
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar max-w-4xl mx-auto">
-          <button
-            onClick={() => setActiveTab('etalase-online')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'etalase-online'
-                ? 'bg-[#008952] text-white shadow-xs'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            <Globe className="w-3.5 h-3.5" />
-            <span>Etalase Web & WA</span>
-          </button>
+      {/* ========================================================
+          ZONA 2: RINGKASAN STATISTIK CEPAT (QUICK STATS BAR) KHAS BERANDA
+          ======================================================== */}
+      <div className="px-4 pt-3">
+        <div className="bg-white rounded-2xl p-3 shadow-xs border border-slate-100">
+          <div className="grid grid-cols-4 gap-2 text-center">
+            <div className="bg-emerald-50/70 rounded-xl p-2 border border-emerald-100/60">
+              <span className="text-[10px] font-semibold text-emerald-700 block truncate">Etalase Web</span>
+              <span className="text-xs font-extrabold text-emerald-800">Cloud QR</span>
+            </div>
+            <div className="bg-blue-50/70 rounded-xl p-2 border border-blue-100/60">
+              <span className="text-[10px] font-semibold text-blue-700 block truncate">Target WA</span>
+              <span className="text-xs font-extrabold text-blue-800">{currentScopedCustomers.length} Kontak</span>
+            </div>
+            <div className="bg-amber-50/70 rounded-xl p-2 border border-amber-100/60">
+              <span className="text-[10px] font-semibold text-amber-700 block truncate">Voucher</span>
+              <span className="text-xs font-extrabold text-amber-800">{activeVouchersCount} Aktif</span>
+            </div>
+            <div className="bg-rose-50/70 rounded-xl p-2 border border-rose-100/60">
+              <span className="text-[10px] font-semibold text-rose-700 block truncate">Broadcast</span>
+              <span className="text-xs font-extrabold text-rose-800">{campaigns.length} Terkirim</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          <button
-            onClick={() => setActiveTab('broadcast-wa')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'broadcast-wa'
-                ? 'bg-[#008952] text-white shadow-xs'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            <Send className="w-3.5 h-3.5" />
-            <span>Broadcast WhatsApp</span>
-          </button>
+      {/* ========================================================
+          ZONA 3: GRID SUB-MENU MARKETING KHAS HALAMAN UTAMA (BERANDA)
+          (Ikon Kotak Bersudut Tumpul Rounded-2xl + Nama Menu)
+          ======================================================== */}
+      <div className="px-4 pt-3">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-xs font-bold text-slate-800 tracking-tight flex items-center gap-1.5">
+            <span>Sub-Menu Marketing {currentBusinessMeta.name}</span>
+            <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-100 text-[#008952]">
+              4 Menu Sinkron
+            </span>
+          </h3>
+          <span className="text-[10px] font-semibold text-slate-400">
+            Sentuh kartu untuk beralih
+          </span>
+        </div>
 
-          <button
-            onClick={() => setActiveTab('promo-diskon')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'promo-diskon'
-                ? 'bg-[#008952] text-white shadow-xs'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            <Tag className="w-3.5 h-3.5" />
-            <span>Promo & Diskon</span>
-          </button>
+        {/* Grid 4 Kolom Identik dengan Gaya Halaman Utama */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          {marketingSubMenuItems.map((item) => {
+            const isActive = activeTab === item.id;
+            const ItemIcon = item.icon;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setActiveTab(item.id)}
+                className={`rounded-2xl p-3 border transition-all duration-200 group active:scale-95 flex flex-col items-center justify-center text-center cursor-pointer relative ${
+                  isActive
+                    ? 'bg-emerald-50/90 border-[#008952] shadow-sm ring-2 ring-emerald-500/25'
+                    : 'bg-white border-slate-100 hover:border-emerald-200 shadow-xs hover:shadow-md'
+                }`}
+              >
+                {/* Badge sudut status */}
+                <span
+                  className={`absolute top-2 right-2 text-[9px] font-black px-1.5 py-0.5 rounded-full ${
+                    isActive
+                      ? 'bg-[#008952] text-white'
+                      : 'bg-slate-100 text-slate-600'
+                  }`}
+                >
+                  {item.badge}
+                </span>
 
-          <button
-            onClick={() => setActiveTab('riwayat-pesan')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'riwayat-pesan'
-                ? 'bg-[#008952] text-white shadow-xs'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            <Clock className="w-3.5 h-3.5" />
-            <span>Riwayat Pesan / Campaign ({campaigns.length})</span>
-          </button>
+                {/* Ikon Hijau Kotak Bersudut Tumpul Rounded-2xl khas Halaman Utama */}
+                <div
+                  className={`w-13 h-13 rounded-2xl flex items-center justify-center shadow-md transition-transform mb-2 ${
+                    isActive
+                      ? 'bg-[#008952] text-white shadow-emerald-700/30 scale-105'
+                      : 'bg-[#008952] text-white shadow-emerald-700/20 group-hover:scale-105'
+                  }`}
+                >
+                  <ItemIcon className="w-6 h-6 text-white stroke-[2.2]" />
+                </div>
+
+                {/* Nama Sub-Menu */}
+                <span
+                  className={`font-bold text-xs tracking-tight transition-colors leading-tight ${
+                    isActive ? 'text-[#008952]' : 'text-slate-800 group-hover:text-[#008952]'
+                  }`}
+                >
+                  {item.title}
+                </span>
+
+                {/* Subtitle */}
+                <span className="text-[10px] text-slate-500 line-clamp-1 mt-0.5">
+                  {item.subtitle}
+                </span>
+
+                {/* Indikator Titik Aktif */}
+                {isActive && (
+                  <div className="w-2 h-1 rounded-full bg-[#008952] mt-1.5" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ========================================================
+          ZONA 4: TAB SWITCHER PILLS (Akses Cepat)
+          ======================================================== */}
+      <div className="px-4 pt-2.5">
+        <div className="bg-white rounded-xl p-1 border border-slate-200/80 shadow-2xs flex items-center gap-1 overflow-x-auto no-scrollbar">
+          {marketingSubMenuItems.map((item) => {
+            const isActive = activeTab === item.id;
+            const ItemIcon = item.icon;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setActiveTab(item.id)}
+                className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                  isActive
+                    ? 'bg-[#008952] text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                }`}
+              >
+                <ItemIcon className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{item.title}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 

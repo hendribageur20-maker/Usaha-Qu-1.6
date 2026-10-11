@@ -225,6 +225,7 @@ export const MENU_MODULES: MenuModuleConfig[] = [
         title: 'Broadcast WhatsApp',
         subtitle: 'Form Draf & Kirim Pesan Promo / Reminder',
         iconName: 'Send',
+        badge: 'WA Blast',
         targetView: 'mkt-broadcast'
       },
       {
@@ -239,7 +240,8 @@ export const MENU_MODULES: MenuModuleConfig[] = [
         id: 'riwayat-pesan',
         title: 'Riwayat Pesan / Campaign',
         subtitle: 'Log Kampanye Pesan & Pengiriman Promosi',
-        iconName: 'Star',
+        iconName: 'Clock',
+        badge: 'Riwayat',
         targetView: 'mkt-history'
       }
     ]
@@ -1283,6 +1285,7 @@ export const RESTO_MODULES: MenuModuleConfig[] = [
         title: 'Broadcast Promo WA',
         subtitle: 'Kirim Info Menu Baru & Diskon',
         iconName: 'Send',
+        badge: 'WA Blast',
         targetView: 'mkt-broadcast'
       },
       {
@@ -1490,6 +1493,7 @@ export const RITEL_MODULES: MenuModuleConfig[] = [
         title: 'Broadcast Promo Pelanggan',
         subtitle: 'Kirim Info Diskon Mingguan via WA',
         iconName: 'Send',
+        badge: 'WA Blast',
         targetView: 'mkt-broadcast'
       },
       {
